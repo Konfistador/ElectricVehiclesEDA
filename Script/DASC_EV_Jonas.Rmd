@@ -1,0 +1,29 @@
+---
+title: "EV"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
+```
+
+```{r}
+ev
+```
+
+### Creating a ggplot
+
+```{r}
+ggplot(data = ev %>% filter(AccelSec < 15)) +
+  geom_point(mapping = aes(x = AccelSec, y = Range_Km))
+```
+
+```{r}
+ggplot(data = ev %>% filter(FastCharge_KmH > 0)) +
+  geom_point(mapping = aes(x = FastCharge_KmH, y = Range_Km))
+```
+
