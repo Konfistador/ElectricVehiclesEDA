@@ -2,6 +2,7 @@
 title: "EV"
 output: html_document
 ---
+### https://www.r-graph-gallery.com
 
 ```{r}
 library(tidyverse)
@@ -27,3 +28,65 @@ ggplot(data = ev %>% filter(FastCharge_KmH > 0)) +
   geom_point(mapping = aes(x = FastCharge_KmH, y = Range_Km))
 ```
 
+### 6. Does the body style affect the range of the vehicle?
+
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+ev2 <- ev %>% filter(BodyStyle != "SPV")
+ev2 <- ev2 %>% filter(BodyStyle != "Station")
+ev2 <- ev2 %>% filter(BodyStyle != "MPV")
+
+### battery pack size relevant here
+
+ggplot(ev2, aes(x=Range_Km, y=BodyStyle)) + 
+    geom_boxplot(
+        
+        # custom boxes
+        color="blue",
+        fill="blue",
+        alpha=0.2,
+        
+        # Notch?
+        notch=TRUE,
+        notchwidth = 0.8,
+        
+        # custom outliers
+        outlier.colour="red",
+        outlier.fill="red",
+        outlier.size=3
+    
+    )
+
+ggplot(ev2, aes(x=as.factor(BodyStyle), y=Range_Km)) + 
+    geom_boxplot(fill="slateblue", alpha=0.2) + 
+    xlab("cyl")
+```
+
+### 6. What body type are the quickest accelerating cars?
+
+```{r}
+
+ev2 <- ev %>% filter(BodyStyle != "SPV")
+ev2 <- ev2 %>% filter(BodyStyle != "Station")
+ev2 <- ev2 %>% filter(BodyStyle != "MPV")
+
+# reorder is close to order, but is made to change the order of the factor levels.
+ev2$class = with(ev2, reorder(BodyStyle, AccelSec, median))
+
+p <- ev2 %>%
+  ggplot( aes(x=BodyStyle, y=AccelSec, fill=BodyStyle)) + 
+    geom_violin() +
+    xlab("class") +
+    theme(legend.position="none") +
+    xlab("")
+#p
+print(p)
+```
+
+### Do cars with certain plug type have the highest range?
+```{r}
+ggplot(data = ev) +
+  geom_point(mapping = aes(x = PlugType, y = Range_Km))
+```
