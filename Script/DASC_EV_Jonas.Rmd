@@ -28,6 +28,10 @@ geom_smooth()
 
 ggplot(ev2, aes(x=Battery_Pack_Kwh, y=FastCharge_KmH, color=BodyStyle, group = BodyStyle)) +
 geom_point()
+
+ggplot(ev2, aes(x=Battery_Pack_Kwh, y=FastCharge_KmH)) +
+geom_point() +
+  facet_wrap(vars(BodyStyle))
 ```
 
 
@@ -76,6 +80,9 @@ geom_smooth()
 ggplot(ev, aes(x=Efficiency_WhKm, y=AccelSec, color=BodyStyle, group = BodyStyle)) +
 geom_point()
 
+ggplot(ev, aes(x=Efficiency_WhKm, y=AccelSec)) +
+geom_point() +
+facet_wrap(vars(BodyStyle))
 
 
 ev2 <- ev %>% filter(BodyStyle != "SPV")
@@ -117,6 +124,11 @@ geom_smooth()
 
 ggplot(ev2, aes(x=Battery_Pack_Kwh, y=Efficiency_WhKm, color=BodyStyle, group = BodyStyle)) +
 geom_point()
+
+ggplot(ev2, aes(x=Battery_Pack_Kwh, y=Efficiency_WhKm)) +
+geom_point() + 
+facet_wrap(vars(BodyStyle))
+
 ```
 
 
