@@ -124,9 +124,6 @@ geom_point()
 
 
 ### 6. Does the body style affect the range of the vehicle?
-
-
-
 ```{r}
 library(ggplot2)
 library(ggExtra)
@@ -137,34 +134,12 @@ ev2 <- ev %>% filter(BodyStyle != "SPV")
 ev2 <- ev2 %>% filter(BodyStyle != "Station")
 ev2 <- ev2 %>% filter(BodyStyle != "MPV")
 
-
+ggplot(ev2, aes(x=as.factor(BodyStyle), y=Range_Km)) +
+geom_boxplot(fill="slateblue", alpha=0.2) +
+xlab("BodyStyle")
 
 ### battery pack size relevant here
-
-
-
-ggplot(ev2, aes(x=Range_Km, y=BodyStyle)) +
-geom_boxplot(
-
-# custom boxes
-color="blue",
-fill="blue",
-alpha=0.2,
-
-# Notch?
-notch=TRUE,
-notchwidth = 0.8,
-
-# custom outliers
-outlier.colour="red",
-outlier.fill="red",
-outlier.size=3
-
-)
-
-
-
-ggplot(ev2, aes(x=as.factor(BodyStyle), y=Range_Km)) +
+ggplot(ev2, aes(x=as.factor(BodyStyle), y=Battery_Pack_Kwh)) +
 geom_boxplot(fill="slateblue", alpha=0.2) +
 xlab("BodyStyle")
 ```
