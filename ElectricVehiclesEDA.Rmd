@@ -86,9 +86,66 @@ evData %>%
 ```
 TODO: Write a short summary
 
-## What is the mean price?
+### What is the mean price?
 ```{r}
 evData %>%
   summarize(meanPrice = mean(PriceEuro))
 ```
 TODO: Write a short summary.
+
+### What is the most-common plugtype?
+```{r}
+evData %>%
+  ggplot(mapping = aes(x=PlugType)) +
+  geom_bar()
+```
+It appears that Type 2CCS is the most-common plugtype.
+
+### What is the mean 0-100 km/h acceleration?
+```{r}
+evData %>%
+  summarize(MeanAccelSec = mean(AccelSec))
+```
+
+### What is the Mean top speed in km/h?
+```{r}
+evData %>%
+  summarize(MeanTopSpeed = mean(TopSpeed_KmH))
+```
+
+### What is the mean range?
+```{r}
+evData %>%
+  summarize(MeanRange = mean(Range_Km))
+```
+
+## Analysing the Co-variations between variables
+
+### How does the mean range vary, between the different bodystyles?
+
+
+```{r}
+evData %>%
+  ggplot(mapping=aes(x=BodyStyle, y = Range_Km)) +
+  geom_boxplot()
+```
+### How does the Battery Pack size affect the range ?
+```{r}
+evData %>%
+  ggplot(mapping = aes(x=Battery_Pack_Kwh, y = Range_Km)) +
+  geom_point() + geom_smooth()
+```
+### What is the covariation between 0-100 Acceleration and the bodystyle of a vehicle?
+```{r}
+evData %>%
+  ggplot(mapping = aes(x=BodyStyle, y = AccelSec)) +
+  geom_boxplot()
+```
+```{r}
+evData %>%
+  filter(BodyStyle == "SPV")
+```
+### Are certain powertrains more commonnly implemented within some bodystyle?
+```{r}
+```
+
