@@ -11,6 +11,7 @@ output: html_document
 #### Distances in the following analysis are in Km(Kilometres) and monetary variables, such as the price, are in Euro(EUR).
 ```{r}
 library(tidyverse)
+evData <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
 ```
 
 ##Distribution of Variables.

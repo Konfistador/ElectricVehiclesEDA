@@ -9,8 +9,6 @@ ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dat
 ev
 ```
 
-
-
 ### 1. Does the battery pack size affect the fast charging rates of evs?
 ```{r}
 ev2 <- ev %>% filter(BodyStyle != "SPV")
@@ -33,11 +31,6 @@ ggplot(ev2, aes(x=Battery_Pack_Kwh, y=FastCharge_KmH)) +
 geom_point() +
   facet_wrap(vars(BodyStyle))
 ```
-
-
-
-
-
 
 ### 2. Which company produces the on average longest range vehicles?
 ```{r}
@@ -66,9 +59,6 @@ coord_flip() +
 xlab("Brand") + ylab("average range")
 ```
 
-
-
-
 ### 3. How does the efficiency of the car affect the 0-100 acceleration times?
 ```{r}
 ggplot(ev, aes(x=Efficiency_WhKm, y=AccelSec)) +
@@ -92,20 +82,12 @@ ggplot(ev2, aes(x=Efficiency_WhKm, y=AccelSec, color=BodyStyle, group = BodyStyl
 geom_boxplot()
 ```
 
-
-
-
 ### 4. Do all cars with a range above the average have the ability to fast charge?
 ```{r}
 ggplot(ev, aes(x=PriceEuro, y=Range_Km, color = RapidCharge)) +
 geom_point() +
 geom_line(data=ev, aes(PriceEuro, mean(ev$Range_Km)))
 ```
-
-
-
-
-
 
 ### 5. Does the battery pack size have a negative impact on efficiency?
 ```{r}
@@ -131,10 +113,6 @@ facet_wrap(vars(BodyStyle))
 
 ```
 
-
-
-
-
 ### 6. Does the body style affect the range of the vehicle?
 ```{r}
 library(ggplot2)
@@ -155,9 +133,6 @@ ggplot(ev2, aes(x=as.factor(BodyStyle), y=Battery_Pack_Kwh)) +
 geom_boxplot(fill="slateblue", alpha=0.2) +
 xlab("BodyStyle")
 ```
-
-
-
 
 ### 7. What body type are the quickest accelerating cars?
 ```{r}
