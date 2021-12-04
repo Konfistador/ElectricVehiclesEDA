@@ -34,3 +34,7 @@ summary(model)
   - 3.850 is the slope of the graph (Steigung des Graphen). This means per 1 kwh more battery size the car can go 3.85 km more
   - 86.752 is the value of x=0. Does not make much sense for this example but it means with 0 battery size a ar can go 86 km.
   
+```{r}
+ plot(model)
+```
+  
