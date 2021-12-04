@@ -1,0 +1,40 @@
+---
+title: "Regression-Jonas"
+output: html_document
+---
+```{r}
+library(tidyverse)
+ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
+ev
+```
+This is my first try of a Simple Linear Regression
+
+1. Show variables in a scatter plot (independent variable X = BatteryPack_size, depended variables Y = Range in km)
+```{r}
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point()
+```
+2. lm()-Command
+```{r}
+  model <- lm(Range_Km ~ Battery_Pack_Kwh, data = ev)
+```
+3. geom_line()
+```{r}
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='lm', formula= y~x)
+```
+4. summary(model)
+```{r}
+summary(model)
+```
+
+4.1 Coefficients and results
+
+  The results show that:
+  - P-Value is very smal (smaller than 0.05) -> Null-Hypothesis can be discarded
+  - R-squared is at 82.87% -> This means 82% of the variance of the dependend variable (Y=range in km) can be explained by this model -> good value
+  - 3.850 is the slope of the graph (Steigung des Graphen). This means per 1 kwh more battery size the car can go 3.85 km more
+  - 86.752 is the value of x=0. Does not make much sense for this example but it means with 0 battery size a ar can go 86 km.
+  
+```{r}
+ plot(model)
+```
+  
