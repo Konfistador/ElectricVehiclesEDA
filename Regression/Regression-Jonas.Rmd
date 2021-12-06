@@ -43,12 +43,50 @@ summary(model)
   From the ggplot above I can see that the simple linear model does fit the data, but a curviliniear, especially a cubic method could be   an even better fit here:
   
 ```{r}
+cor(ev$Battery_Pack_Kwh, I(ev$Battery_Pack_Kwh^2))
+```
+  This command chacks for correclatio of 2 varaiables, because multivariate models make the assumption that all values are independent from each other. This means we have a structurall correlation type here. Because of this the data cannot be read afterwards from the model. But the model can still fit the data very well. It makes it just hard to analyse the model.
+  
+```{r}
+  model <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2) + I(Battery_Pack_Kwh ^3), data = ev)
+
+  summary(model)
+  plot(model)
+
   ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='auto', formula= y~x)
 ```
 
-Looking at the results of the simple regression I'm thinking how the model can be improved. Using the efficiency as an additional variable makes no sense to me, because then the result can be calculated. This is not the type of relationship a regression should describe so I have decided to try building another model with the BatterySize and the bodytype as variables to determine the range.
-Since the BodyType is a categorical value the procedure for regressing is a bit different. Also the variable need to be independent from another and the model will not be describable in the end anymore.
+Looking at the results of the simple regression I'm thinking how the model can be improved. Using the efficiency as an additional variable makes no sense to me, because then the result can be calculated. This is not the type of relationship a regression should describe so I have decided to try building another model with the BatterySize and the BodyStyle as variables to determine the range.
+Since the BodyStyle is a categorical value the procedure for regressing is a bit different. Also the variable need to be independent from another and the model will not be describable in the end anymore.
 
+```{r}
+library(plyr)
+count(ev, "BodyStyle")
+
+ggplot(ev, aes(x = BodyStyle, y = Range_Km)) +
+  geom_boxplot()
+```
+
+2. lm()-Command
+```{r}
+  model2 <- lm(Range_Km ~ Battery_Pack_Kwh + BodyStyle, data = ev)
+```
+
+3. summary(model)
+```{r}
+summary(model2)
+```
+The new model shows improvemnts in the r-squared and F-statistic
+
+
+```{r}
+ plot(model2)
+```
+
+```{r}
+ anova(model, model2)
+```
+By analysing the results from above I can see the Pr(>F) value is extremly low and therefore the Hypothesis H0 can be rejected.
 
 
   
