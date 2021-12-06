@@ -11,7 +11,7 @@ This is my first try of a Simple Linear Regression
 
 1. Show variables in a scatter plot (independent variable X = BatteryPack_size, depended variables Y = Range in km)
 ```{r}
-  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point()
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() 
 ```
 2. lm()-Command
 ```{r}
@@ -37,4 +37,18 @@ summary(model)
 ```{r}
  plot(model)
 ```
+  
+  Regression part 2
+  
+  From the ggplot above I can see that the simple linear model does fit the data, but a curviliniear, especially a cubic method could be   an even better fit here:
+  
+```{r}
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='auto', formula= y~x)
+```
+
+Looking at the results of the simple regression I'm thinking how the model can be improved. Using the efficiency as an additional variable makes no sense to me, because then the result can be calculated. This is not the type of relationship a regression should describe so I have decided to try building another model with the BatterySize and the bodytype as variables to determine the range.
+Since the BodyType is a categorical value the procedure for regressing is a bit different. Also the variable need to be independent from another and the model will not be describable in the end anymore.
+
+
+
   
