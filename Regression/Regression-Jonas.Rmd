@@ -9,6 +9,8 @@ install.packages("plyr")
 ```
 
 ```{r}
+ev 
+
 ev2 <- ev %>% filter(Battery_Pack_Kwh >= 100)
   ev2
   
