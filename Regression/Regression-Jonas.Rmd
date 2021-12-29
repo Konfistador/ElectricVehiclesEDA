@@ -3,7 +3,7 @@ title: "Regression-Jonas"
 output: html_document
 ---
 
-# Regression Jonas Brockmöller
+# Regression part I
 The goal of a regression is to measure the relationship of 2 (or more) variables. It will be a challenge to find a graph the can fit the data points in our data set as good as possible. For my regression I decided to investigate the relationship of the Battery size to the range in kilometers. It is to be expected that I am going to try and prove my hypothesis that the bigger the battery is, the more kilometers the car can drive. The plan is to start simple by investigating the relationship of only 2 variable first, but it leaves the opportunity open to add more variables in the process.
 The first step is to import the data and essential libraries for this script:
 
@@ -90,7 +90,7 @@ Above are 4 plots of the simple linear regression model. Even though it has been
 * The scale vs Location graph also hints at an undiscovered qudratic relationship, because of the curvilinear behavior of the red line.
   
   
-# Regression part 2
+# Regression part II
   
 From the ggplot above I can see that the simple linear model does fit the data perfectly, but a curvilinear, especially a quadratic method could be an even better fit for the given data:
   
@@ -151,27 +151,25 @@ ggplot(usefulBodySyles, aes(x = BodyStyle, y = Range_Km)) +
   summary(model2)
   plot(model2)
 ```
-
 The new model shows improvements in the r-squared and F-statistic
+By analysing the results from above I can see the Pr(>F) value is extremly low and therefore the Hypothesis H0 can be rejected.
 
 ```{r}
  # anova(model, model2)
 ```
-By analysing the results from above I can see the Pr(>F) value is extremly low and therefore the Hypothesis H0 can be rejected.
 
 # Multiple linear Regression with price (non-categorical variable)
-```{r}
-  lmPrice <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2) + I(Battery_Pack_Kwh^3) + PriceEuro, data = ev)
-  summary(lmPrice)
-```
   
 ```{r}
-  ggplot(ev, aes(x=Battery_Pack_Kwh,y=PriceEuro)) + geom_point() + geom_smooth(method='auto',level=0.95)+ labs(x = "Capacity of the      Battery pack in KwH", y = "Price in Euro")
-
+  ggplot(ev, aes(x=PriceEuro,y=Battery_Pack_Kwh)) + geom_point() + geom_smooth(method='auto',level=0.95)+ labs(x = "Price in Euro", y = "Capacity of the Battery pack in KwH")
+```
+```{r}
+  lmPrice <- lm(Battery_Pack_Kwh ~ PriceEuro + I(PriceEuro^2), data = ev)
+  summary(lmPrice)
   # par(mfrow=c(2,2))
   plot(lmPrice)
 ```
-  
+
 ```{r}
 #correlation and vif factor check for collinearity
 cor(ev$Battery_Pack_Kwh, ev$PriceEuro)
@@ -180,9 +178,3 @@ cor(ev$Battery_Pack_Kwh, ev$PriceEuro)
 ```{r}
 # vif(lmPrice)
 ```
-  
-```{r}
-anova(modelSqared,lmPrice)
-```
-  
-  
