@@ -2,52 +2,79 @@
 title: "Regression-Jonas"
 output: html_document
 ---
-```{r}
-install.packages("tidyverse")
-install.packages("gghighlight")
-install.packages("plyr")
-```
-
-```{r}
-ev 
-
-ev2 <- ev %>% filter(Battery_Pack_Kwh >= 100)
-  ev2
-  
-  ev3 <- ev %>% filter(Range_Km >= 500)
-  ev3
-```
 
 # Regression Jonas Brockmöller
-The goal of a relationship is to measure the relationship of 2 (or more) variables. It will be a challenge to find a graph the can fit every data point in our data set. For my regression I decided to investigate the relationship of the Battery size to the range in kilometers. It is to be expected that I am going to try and prove my hypothesis that the bigger the battery is, the more kilometers the car can drive. The plan is to start simple by investigateing the relationship of only 2 variable first, but it leaves the opportunity open to add more variables in the process.
+The goal of a regression is to measure the relationship of 2 (or more) variables. It will be a challenge to find a graph the can fit the data points in our data set as good as possible. For my regression I decided to investigate the relationship of the Battery size to the range in kilometers. It is to be expected that I am going to try and prove my hypothesis that the bigger the battery is, the more kilometers the car can drive. The plan is to start simple by investigating the relationship of only 2 variable first, but it leaves the opportunity open to add more variables in the process.
+The first step is to import the data and essential libraries for this script:
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("gghighlight")
+# install.packages("plyr")
+
+library(tidyverse)
+library(gghighlight)
+library(plyr)
+```
+
+```{r}
+ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
+ev
+```
+Above is the imported data shown contain information about all announced and released fully electric vehicles for the european and amarican market. In the following I am going to investigate the hypothesis about the relationship between the battery size and the range. In this dataset the battery size is given in KwH and the range is of type kilometers.
+
 
 ## 1. Show variables in a scatter plot (independent variable X = BatteryPack_size, depended variables Y = Range in km)
+The following scatterplot shows the outliers in the dataset and the tibble will give additional details about these outliers:
 ```{r}
-  library(tidyverse)
-  library(gghighlight)
-  ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
+  # Show outliers in the data in a scatter plot
   ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + gghighlight(Battery_Pack_Kwh > 100)
+
+  # Show outliers in the data in form of a tibble
+  outliers <- ev %>% filter(Battery_Pack_Kwh > 100)
+  
+  # Filter the undesired columns to only show a tible with relevant information
+  undesiredColumns <- c('Segment', 'Seats', 'PlugType', 'PowerTrain', 'RapidCharge',   'FastCharge_KmH', 'Efficiency_WhKm',                'TopSpeed_KmH', 'AccelSec', 'PlugType')
+  outliers <- outliers %>% select(-one_of(undesiredColumns))
+  
+  # Show the cleaned tibble
+  outliers
+```  
+As it can be seen above the outliers are either 100000€ or more supercars or the announced but not yet released cybertruck. The cybertruck will be equiped with a new type of battery and 120-200 KwH of capacity. These numbers are out of scope for this regression and would only make the result inaccurate so they are left out.
+
+
+```{r}
+  #Filter out exceptional data
+  ev <- ev %>% filter(Battery_Pack_Kwh < 100) 
+  ev <- ev %>% filter(Range_Km < 550)
+  ev <- ev %>% filter(Range_Km != 250)
+  
+  #Show a scatter plot with the cleaned dataset
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point()
 ```
-In this first step the relationship of the X-variable (BatteryPackSize) and the Y-Variable(Range in km) is presented. In addition the outliers have been found and investigated.
+In this first step the relationship of the X-variable (BatteryPackSize) and the Y-Variable(Range in km) is presented based on the cleaned dataset. In addition the outliers have been found, investigated and removed.
 
 ## 2. lm()-Command, regression line and model summary
+In the following the regression line will be visualized and a model is calculated. 
 ```{r}
-  model <- lm(Range_Km ~ Battery_Pack_Kwh, data = ev)
+  # Simple linear regression line on the scatter plot
   ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='lm', formula= y~x)
-  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='lm', formula= y~x) + gghighlight(Range_Km == 575)
+  
+  # Calculate simple regression model
+  model <- lm(Range_Km ~ Battery_Pack_Kwh, data = ev)
   summary(model)
 ```
 #### 4.1 Coefficients and regression model results
-Shown above is the simple linear regression model. The single highlighted data point is the biggest outlier in this regression model.Because of this I feel inclined to say that the regression model is showing a kind of strong relationship between the 2 variables.
+Shown above is the simple linear regression model. I feel inclined to say that the regression model is showing a kind of strong relationship between the 2 variables.
 
 But lets review the regression results first:
-* The extremely low p-value (< 2e-16) is marked with *** which is the best possible case. In this test the Null-Hypothesis is being investigated. In this case the possiblity that the battery pack size does NOT have a relationship with the range of an electirc vehicle. Luckily the result was well under 0.5 and because of this the Null-hypothesis can be rejected. 
+* The extremely low p-value (< 2e-16) is marked with *** which is the best possible case. In this test the Null-Hypothesis is being investigated. In this case the possibility that the battery pack size does NOT have a relationship with the range of an electric vehicle can be discarded. Luckily the result was well under 0.5 and because of this the Null-hypothesis can be rejected. 
 
-* The Multiple R-squared value is at 82.87% which is a great result and mean that this regression model can explain 82% of the given data set. This model is by far not under-fitting the data.
+* The Multiple R-squared value is at 81.63% which is a great result and means that this regression model can explain 81% of the given data set. This model is by far not under-fitting the data.
 
 * The Estimate value for the Intercept is a bit of nonsense in this example because it means that an ev with a batterypack size of 0 has a range of 86.752 kilometers.
 
-* The Estimate value for the batterypack size variable on the other hand is representing a very important part of a linear model. The 3.850 describe the slope of the graph. That means per 1 KwH larger batterypack size an electric vehicle can go 3.85 km more.
+* The Estimate value for the batterypack size variable on the other hand is representing a very important part of a linear model. The 3.9989 describe the slope of the graph. That means per 1 KwH larger batterypack size an electric vehicle can go 3.99 km more.
 
 * From a mathematical standpoint looking at the formular for linear graphs f(x) = mx + b, then is the "m" described by the estimate for the batterypack size and the "b" is equal to the estimate value of the intercept.
 
@@ -56,51 +83,106 @@ But lets review the regression results first:
 ```
 Above are 4 plots of the simple linear regression model. Even though it has been made clear in the previous paragraph that this model still has issues and that there is room for improvement I want to go over the result and explain where the issues are and how they can be improved in later versions of the model:
 
+* The residuals vs. Fitted plots red line should be close to the perfect dotted grey line. But in this regression model it hints to an undiscovered quadratic relationship, because the graph proceeds curvlinear.
 
+* The Normal Q-Q Graph shows good results for the regression. Only small deviations are visible in this model.
+
+* The scale vs Location graph also hints at an undiscovered qudratic relationship, because of the curvilinear behavior of the red line.
   
   
 # Regression part 2
   
-From the ggplot above I can see that the simple linear model does fit the data, but a curviliniear, especially a cubic method could be an even better fit here:
+From the ggplot above I can see that the simple linear model does fit the data perfectly, but a curvilinear, especially a quadratic method could be an even better fit for the given data:
   
+```{r}
+  # Scatterplot with a quadratic geom smooth line
+  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='auto', formula= y~x)
+```
+The scatter plot above is based on the same dataset as before, but the regression line has been modified. I assume the relatioship is not of the simple linear type, but more of a quadratic relationship.
+
+```{r}
+  # Regression model for a quadratic relationship
+  modelSqared <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2), data = ev)
+
+  summary(modelSqared)
+  
+  # par(mfrow=c(2,2))
+  plot(modelSqared)
+```
+Because the this model is a multiple linear regression model the results cannot be descibed and interpreted anymore. This is the reason that the model results can only be compared on the numbers but not on the meaning.
+
+```{r}
+ #vif(modelSqared)
+```
+
 ```{r}
   cor(ev$Battery_Pack_Kwh, I(ev$Battery_Pack_Kwh^2))
 ```
-This command chacks for correclation of 2 varaiables, because multivariate models make the assumption that all values are independent from each other. This means we have a structurall correlation type here. Because of this the data cannot be read afterwards from the model. But the model can still fit the data very well. It makes it just hard to analyse the model.
-  
-```{r}
-  model <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2) + I(Battery_Pack_Kwh ^3), data = ev)
+This command chacks for correclation of 2 varaiables, because multivariate models make the assumption that all values are independent from each other. This means we have a structural correlation type here. Because of this the data cannot be read afterwards from the model. But the model can still fit the data very well. It makes it just hard to analyse the model.
 
-  summary(model)
-  plot(model)
-
-  ggplot(ev, aes(x=Battery_Pack_Kwh, y=Range_Km)) + geom_point() + geom_smooth(method='auto', formula= y~x)
-```
+# Multiple linear Regression with Bodystyle (categorical variable)
 
 Looking at the results of the simple regression I'm thinking how the model can be improved. Using the efficiency as an additional variable makes no sense to me, because then the result can be calculated. This is not the type of relationship a regression should describe so I have decided to try building another model with the BatterySize and the BodyStyle as variables to determine the range.
 Since the BodyStyle is a categorical value the procedure for regressing is a bit different. Also the variable need to be independent from another and the model will not be describable in the end anymore.
 
 ```{r}
-library(plyr)
+# This command produces a  tibble with the count of each bodystyle
 count(ev, "BodyStyle")
 
+# Plotting a boxsplot for each bodystyle to visualize the relationship
 ggplot(ev, aes(x = BodyStyle, y = Range_Km)) +
+  geom_boxplot()
+
+# Cleaning the dataset for useful categories
+usefulBodySyles <- ev
+usefulBodySyles <- usefulBodySyles %>% filter(BodyStyle != 'MPV')
+usefulBodySyles <- usefulBodySyles %>% filter(BodyStyle != 'Station')
+usefulBodySyles <- usefulBodySyles %>% filter(BodyStyle != 'Cabrio')
+
+# Plotting a boxsplot with the cleaned and useful dataset
+ggplot(usefulBodySyles, aes(x = BodyStyle, y = Range_Km)) +
   geom_boxplot()
 ```
 
 2. lm()-Command, summary(model) and plot(model2)
 ```{r}
-  model2 <- lm(Range_Km ~ Battery_Pack_Kwh + BodyStyle, data = ev)
+  # Calculate a regression model for the cleaned dataset 
+  model2 <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2) + BodyStyle, data = usefulBodySyles)
   summary(model2)
   plot(model2)
 ```
 
-The new model shows improvemnts in the r-squared and F-statistic
+The new model shows improvements in the r-squared and F-statistic
 
 ```{r}
- anova(model, model2)
+ # anova(model, model2)
 ```
 By analysing the results from above I can see the Pr(>F) value is extremly low and therefore the Hypothesis H0 can be rejected.
 
+# Multiple linear Regression with price (non-categorical variable)
+```{r}
+  lmPrice <- lm(Range_Km ~ Battery_Pack_Kwh + I(Battery_Pack_Kwh^2) + I(Battery_Pack_Kwh^3) + PriceEuro, data = ev)
+  summary(lmPrice)
+```
+  
+```{r}
+  ggplot(ev, aes(x=Battery_Pack_Kwh,y=PriceEuro)) + geom_point() + geom_smooth(method='auto',level=0.95)+ labs(x = "Capacity of the      Battery pack in KwH", y = "Price in Euro")
 
+  # par(mfrow=c(2,2))
+  plot(lmPrice)
+```
+  
+```{r}
+#correlation and vif factor check for collinearity
+cor(ev$Battery_Pack_Kwh, ev$PriceEuro)
+```
+
+```{r}
+# vif(lmPrice)
+```
+  
+```{r}
+anova(modelSqared,lmPrice)
+```
+  
   
