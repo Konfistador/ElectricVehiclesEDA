@@ -7,20 +7,21 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Exploratory Data Analysis by Mino Karadzhov and Jonas Brockmöller
+
+This is the first part of the data science assignment, which was created in a group work by Mino Karadzhov and Jonas Brockmöller.
+As you can see in the following we decided to use a dataset about electric vehicles. This dataset contains information about already released and also announced vehicles for mainly the american and European market.
+
+### Note to the reader:
+#### Distances in the following analysis are always in Km(Kilometres) and monetary variables, such as the price, are in Euro(EUR).
 ```{r}
 library(tidyverse)
 ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
 ev
 ```
 
-# Electric Vehicles Exploratory Data Analysis
-
-### Note to the reader:
-#### Distances in the following analysis are in Km(Kilometres) and monetary variables, such as the price, are in Euro(EUR).
-
 ##Distribution of Variables.
 In this first part of the Exploratory Data Analysis, we will analyse the distribution of different variables, within the dataset. Our main tool for conducting this are the questions that follow.
-
 
 ### What is the number of different car models, present in the Dataset?
 
@@ -67,6 +68,7 @@ ev %>%
   filter(RapidCharge == "Yes") %>%
   summarize(vehiclesWithRapidCharge = n())
 ```
+The code above has identified 97 cars that support rapidcharge, which is presented in the tibble.
 
 ### What is the most-common Powertrain, within the different models?
 ```{r}
@@ -74,7 +76,7 @@ ev %>%
   ggplot(mapping = aes(x = PowerTrain)) +
   geom_bar()
 ```
-The barchart above shows the distribution of electirc vehicle powertrians. The most common type is the All-wheel-drive, closly followed by the front-wheel drive. The Rear-wheel drive powertrain is less common.
+The barchart above shows the distribution of electric vehicle powertrains. The most common type is the All-wheel-drive, closly followed by the front-wheel drive. The Rear-wheel drive powertrain is less common.
 
 ### What is the most common vehicle bodystyle? 
 ```{r}
@@ -90,14 +92,14 @@ ev %>%
   ggplot(mapping = aes(x= Seats)) +
   geom_bar()
 ```
-Most cars are equiped with 5 seats. Some models only have 4 seats but the majority of the electric vehicles can seat 5 people.
+Most cars are equipped with 5 seats. Some models only have 4 seats but the majority of the electric vehicles can seat 5 people.
 
 ### What is the mean price?
 ```{r}
 ev %>%
   summarize(meanPrice = mean(PriceEuro))
 ```
-The mean price of all existing electric vehicle models is at 55.997€.
+The mean price of all existing electric vehicle models is at 55.997€ according to our data.
 
 ### What is the most-common plugtype?
 ```{r}
@@ -112,7 +114,7 @@ The Type 2 CSS plug is standard equipment in the EU so it is no surprise that th
 ev %>%
   summarize(MeanAccelSec = mean(AccelSec))
 ```
-The average acceleration time from 0 -100 km/h for all electric vehicles is at 7.39 seconds.
+The average acceleration time from 0 -100 km/h for all electric vehicles is at 7.39 seconds according to our data.
 
 ### What is the Mean top speed in km/h?
 ```{r}
@@ -130,24 +132,18 @@ ev %>%
 As it can be seen above the mean range of all electric vehicles is 338 (kilometers!).
 
 # Do Vehicles with RapidCharge Accelerate different than the ones without ?
-### It appears they actually do! Unforntunately we do not have data on the weight of the vehicle, otherwise we could've investigated futher.
 ```{r}
 ggplot(ev, aes(x = RapidCharge, y = AccelSec)) +
   geom_boxplot()
 ```
+It appears they actually do! Unforntunately we do not have data on the weight of the vehicle, otherwise we could have investigated futher here.
 
 ##What is the number of RapidCharge Vehicles?
-### It appears that the vast majority of Vehicles have RapidCharge. Could it be that we are getting the data above, simply because there are more datapoints in one of the sub-categories?
 ```{r}
   ggplot(ev, aes(x = RapidCharge)) +
   geom_bar()
 ```
-
-##What is the distribution of this categorical variable?
-```{r}
-  ggplot(ev, aes(x=PowerTrain)) +
-  geom_bar()
-```
+It appears that the vast majority of Vehicles have RapidCharge.
 
 ## Analysing the Co-variations between variables
 
@@ -160,7 +156,7 @@ ggplot(ev, aes(x = RapidCharge, y = AccelSec)) +
 ### How does the Battery Pack size affect the range ?
 ```{r}
   ggplot(ev, aes(x=Battery_Pack_Kwh, y = Range_Km)) +
-  geom_point() + geom_smooth()
+  geom_point()
 ```
 
 ### What is the covariation between 0-100 Acceleration and the bodystyle of a vehicle?
@@ -168,15 +164,11 @@ ggplot(ev, aes(x = RapidCharge, y = AccelSec)) +
   ggplot(ev, aes(x=BodyStyle, y = AccelSec)) +
   geom_boxplot()
 ```
-```{r}
-ev %>%
-  filter(BodyStyle == "SPV")
-```
 
 ### Do vehicles with certain plug type have the highest range?
 ```{r}
   ggplot(ev, aes(x= PlugType, y = Range_Km)) +
-  geom_point() + geom_smooth()
+  geom_boxplot()
 ```
 
 ### Do vehicles with certain powertrain accelerate faster?
@@ -209,6 +201,7 @@ ggplot(ev2, aes(x=Battery_Pack_Kwh, y=FastCharge_KmH)) +
 geom_point() +
   facet_wrap(vars(BodyStyle))
 ```
+The graphs above show that the fast charging rate is affected by the battery pack size. Further graphs show that especially SUVs with batteries bigger than 75 KwH are out of line with the other body styles.
 
 ### 2. Which company produces the on average longest range vehicles?
 ```{r}
@@ -236,6 +229,7 @@ theme_classic() +
 coord_flip() +
 xlab("Brand") + ylab("average range")
 ```
+The histogram above shows that CUPRA produces the cars with the longest average range with 425 km, followed by Tesla (420km), Polestar (400 km) and Ford (395 km). Smart has the cars with the on average shortest range with 96.67 km.
 
 ### 3. How does the efficiency of the car affect the 0-100 acceleration times?
 ```{r}
@@ -259,6 +253,7 @@ ev2 <- ev2 %>% filter(BodyStyle != "MPV")
 ggplot(ev2, aes(x=Efficiency_WhKm, y=AccelSec, color=BodyStyle, group = BodyStyle)) +
 geom_boxplot()
 ```
+As it can be seen above there are many efficient cars that accelerate slowly, but the trend is not as obvious as expected. But for many cars it is true that the more efficient the slower the car accelerates. But there are many outliers to this rule.
 
 ### 4. Do all cars with a range above the average have the ability to fast charge?
 ```{r}
@@ -266,6 +261,7 @@ ggplot(ev, aes(x=PriceEuro, y=Range_Km, color = RapidCharge)) +
 geom_point() +
 geom_line(data=ev, aes(PriceEuro, mean(ev$Range_Km)))
 ```
+The scatterplot clealy shows that there is no ar with a range above the average that does not support  fast charging.
 
 ### 5. Does the battery pack size have a negative impact on efficiency?
 ```{r}
@@ -290,6 +286,7 @@ geom_point() +
 facet_wrap(vars(BodyStyle))
 
 ```
+The line in the scatter plot shows a clear trend, that the bigger the battery is, the less effient the car drives. Although this can have more reasons than just the battery pack size which will be investigated in the following:
 
 ### 6. Does the body style affect the range of the vehicle?
 ```{r}
@@ -310,7 +307,13 @@ xlab("BodyStyle")
 ggplot(ev2, aes(x=as.factor(BodyStyle), y=Battery_Pack_Kwh)) +
 geom_boxplot(fill="slateblue", alpha=0.2) +
 xlab("BodyStyle")
+
+ggplot(ev2, aes(x=as.factor(BodyStyle), y=Efficiency_WhKm)) +
+geom_boxplot(fill="slateblue", alpha=0.2) +
+xlab("BodyStyle")
 ```
+The three boxsplot graphs above show the distribution of the range, battery pack size and the efficiency per body style. Here it becomes obvious that the body style has a big effect on the efficiency. The high range for Pickups and SUVs can only be reached because of big battery packs. This can be seen when looking at the Sedan vs the SUV. Both body styles have about the same battery pack size, but SUVs are less efficient, which results in less range for the SUV.
+
 
 ### 7. What body type are the quickest accelerating cars?
 ```{r}
@@ -320,3 +323,4 @@ ev2 <- ev2 %>% filter(BodyStyle != "MPV")
 ggplot(ev2, aes(x=AccelSec, y=BodyStyle)) +
 geom_boxplot()
 ```
+Sedans are mostly the quickest accelerating cars. But a cabrio is the fastest car in this dataset. 

@@ -2,11 +2,13 @@
 title: "Regression-Jonas"
 output: html_document
 ---
+This is the second part of this DASC assignment. In contrast to the exploratory data analysis is this regression done individually. 
+In the following I will walk you through a simple linear regression, followed by a curvilinear regression.
 
 # Regression part I
 The goal of a regression is to measure the relationship of 2 (or more) variables. It will be a challenge to find a graph the can fit the data points in our data set as good as possible. For my regression I decided to investigate the relationship of the Battery size to the range in kilometers. It is to be expected that I am going to try and prove my hypothesis that the bigger the battery is, the more kilometers the car can drive. The plan is to start simple by investigating the relationship of only 2 variable first, but it leaves the opportunity open to add more variables in the process.
-The first step is to import the data and essential libraries for this script:
 
+The first step is to import the data and essential libraries for this script:
 ```{r}
 # install.packages("tidyverse")
 # install.packages("gghighlight")
@@ -21,8 +23,7 @@ library(plyr)
 ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
 ev
 ```
-Above is the imported data shown contain information about all announced and released fully electric vehicles for the european and amarican market. In the following I am going to investigate the hypothesis about the relationship between the battery size and the range. In this dataset the battery size is given in KwH and the range is of type kilometers.
-
+Above is the imported data shown contain information about all announced and released fully electric vehicles for the European and American market. In the following I am going to investigate the hypothesis about the relationship between the battery size and the range. In this dataset the battery size is given in KwH and the range is of type kilometers.
 
 ## 1. Show variables in a scatter plot (independent variable X = BatteryPack_size, depended variables Y = Range in km)
 The following scatterplot shows the outliers in the dataset and the tibble will give additional details about these outliers:
@@ -40,8 +41,7 @@ The following scatterplot shows the outliers in the dataset and the tibble will 
   # Show the cleaned tibble
   outliers
 ```  
-As it can be seen above the outliers are either 100000€ or more supercars or the announced but not yet released cybertruck. The cybertruck will be equiped with a new type of battery and 120-200 KwH of capacity. These numbers are out of scope for this regression and would only make the result inaccurate so they are left out.
-
+As it can be seen above the outliers are either supercars that cost more than 100000€ or it is a version of the announced but not yet released Tesla Cybertruck. The Cybertruck will be equipped with a new type of battery and 120-200 KwH of capacity. These numbers are exceptional and would only make the result of this regression inaccurate so they are left out.
 
 ```{r}
   #Filter out exceptional data
@@ -67,10 +67,11 @@ In the following the regression line will be visualized and a model is calculate
 #### 4.1 Coefficients and regression model results
 Shown above is the simple linear regression model. I feel inclined to say that the regression model is showing a kind of strong relationship between the 2 variables.
 
-But lets review the regression results first:
-* The extremely low p-value (< 2e-16) is marked with *** which is the best possible case. In this test the Null-Hypothesis is being investigated. In this case the possibility that the battery pack size does NOT have a relationship with the range of an electric vehicle can be discarded. Luckily the result was well under 0.5 and because of this the Null-hypothesis can be rejected. 
+####  But lets review the regression results first for the Residuals:
+* Residuals are essentially the difference between the actual value and the prediced value of the regression model. The residual section contains 5 values. A symmetrical distribution would be an indicator to answer how well the model fits the data. In this case the distribution of the residuals does appear to be somewhat symmetrical because the median is at 5.135. This means the model is slightly left-skewed. This tells us that our model is not predicting as well at the lower ranges as it does for the higher.
 
-* The Multiple R-squared value is at 81.63% which is a great result and means that this regression model can explain 81% of the given data set. This model is by far not under-fitting the data.
+#### Now the coeffients will be analysed:
+* The extremely low p-value (< 2e-16) is marked with *** which is the best possible case. In this test the Null-Hypothesis is being investigated. In this case the Null-Hypothesis is that the battery pack size does NOT have a relationship with the range of an electric vehicle. Because of the perfect p-value the Null-Hypothesis can be discarded in this regression model.
 
 * The Estimate value for the Intercept is a bit of nonsense in this example because it means that an ev with a batterypack size of 0 has a range of 86.752 kilometers.
 
@@ -78,14 +79,25 @@ But lets review the regression results first:
 
 * From a mathematical standpoint looking at the formular for linear graphs f(x) = mx + b, then is the "m" described by the estimate for the batterypack size and the "b" is equal to the estimate value of the intercept.
 
+* The standard error of the Battery pack size is at 0.2022. This means that the previously established slope of the model with 3.9989 can deviate by 0.2022. In other words, it can be said that the range per added KwH of battery capacity vary by 0.2022 kilometers.
+
+* The t-value has to be as far away from 0 as possible. In this case it is relativly far away from zero with 19.776. This indicates that the Null-Hypothesis can be rejected and a relationship between range and battery capacity exists.
+
+#### The rest of the values are now reviewed:
+* Residual standard error is an indicator of the quality of the linear model fit and in this case it is at 41.96. It simply descibes the average amount that the datapoints deviates from the true regression line. 41.96 is not the best case but still in a acceptable distance.
+
+* For this regression 98 data points and two parameters (intercept and slope) were used. The degrees of freedom means that 88 out of the 98 data points went into the calculation and estimation of the parameters.
+
+* The Multiple R-squared value is at 81.63% which is a great result and means that this regression model can explain 81.63% of the given data set. This model is by far not under-fitting the data. If anything it is close to overfitting the data.
+
 ```{r}
  plot(model)
 ```
 Above are 4 plots of the simple linear regression model. Even though it has been made clear in the previous paragraph that this model still has issues and that there is room for improvement I want to go over the result and explain where the issues are and how they can be improved in later versions of the model:
 
-* The residuals vs. Fitted plots red line should be close to the perfect dotted grey line. But in this regression model it hints to an undiscovered quadratic relationship, because the graph proceeds curvlinear.
+* The residuals vs. Fitted plots red line should be close to the perfect dotted grey line. But in this regression model it hints to an undiscovered curvilinear relationship, because the graph proceeds in a curve. Most likely this indicates a hidden quadratic relationship.
 
-* The Normal Q-Q Graph shows good results for the regression. Only small deviations are visible in this model.
+* The Normal Q-Q Graph shows good results for the regression. Only small deviations are visible in the lower end of this model. This was already discovered at the review of the Residuals and only underlines the statemant from above.
 
 * The scale vs Location graph also hints at an undiscovered qudratic relationship, because of the curvilinear behavior of the red line.
   
