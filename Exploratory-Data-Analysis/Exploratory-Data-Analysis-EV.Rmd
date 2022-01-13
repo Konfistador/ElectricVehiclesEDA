@@ -1,82 +1,59 @@
 ---
 title: "Exploratory-Data-Analysis-EV"
+author: "Mino Karadzhov", "Jonas Brockmöller"
+date: "14/01/2022"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Exploratory Data Analysis by Mino Karadzhov and Jonas Brockmöller
+# Electric Vehicels Exploratory Data Analysis.
+## Written by Mino Karadzhov and Jonas Brockmöller
 
-This is the first part of the data science assignment, which was created in a group work by Mino Karadzhov and Jonas Brockmöller.
-As you can see in the following we decided to use a dataset about electric vehicles. This dataset contains information about already released and also announced vehicles for mainly the american and European market.
+The following document presents the results of an Exploratory Data Analysis conducted on Electric Vehicles Dataset. Data within the dataset has been manually collected and the same can be found on the following address : https://www.kaggle.com/geoffnel/evs-one-electric-vehicle-dataset?select=ElectricCarData_Clean.csv.
+The underlying dataset contains technical specification about the vehicles and their price in Germany(before tax incentives).
 
 ### Note to the reader:
 #### Distances in the following analysis are always in Km(Kilometres) and monetary variables, such as the price, are in Euro(EUR).
+
+## Importing libraries and the dataset
 ```{r}
 library(tidyverse)
-ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
-ev
+library(ggplot2)
+library(ggExtra)
+ev <- read_csv("ElectricCarData.csv")
 ```
+## Overall Summary of the Data
+```{r}
+summary(ev)
+```
+The above summary provides us with a general overview of our data. This is helpful, as the overall view gives us useful information about the different variables and observations. The same can be useful, when determining the variables of interest for our analysis.
 
+ 
 ##Distribution of Variables.
-In this first part of the Exploratory Data Analysis, we will analyse the distribution of different variables, within the dataset. Our main tool for conducting this are the questions that follow.
+In this part of the Exploratory Data Analysis, we will analyze the distribution of different variables, within the data This may be helpful for identifying certain patterns, which could be worth analysing further.
+One of our main tools for conducting this are the questions that follow.
 
-### What is the number of different car models, present in the Dataset?
+### Which are the fifth most-observed car brands in our data?
+```{r}
+fiveCommonBrands <- ev %>% 
+  group_by(Brand)%>%
+  summarize(numberOfModels = n()) %>% 
+  arrange(desc(numberOfModels)) %>%
+  head(5) %>%
+  print()
+```
+From the above tabular view, we can gain insights, regarding how much models are represented per each car brand. After arranging the same in a descending order, we can see the five brands that have the biggest number of models in the dataset. The same will have the following view on a plot:
 
 ```{r}
-ev %>%
-  summarize(numberOfDifferentCarModels = n())
+fiveCommonBrands %>% 
+  ggplot(mapping = aes(reorder(Brand, -numberOfModels), numberOfModels)) +
+  geom_bar(stat = "summary", fun.y = "mean") +
+  ggtitle("Five most-common car brands in the data")
 ```
-From the Tabular view above, we have an indication that 102 different car models are present within the dataset, that we are going to Analyse.
-
-### Which is the fifth most-observed brands in our Dataset?
-```{r}
-ev %>%
-  group_by(Brand) %>%
-  mutate(count = n()) %>%
-  filter(count > 5) %>%
-  ggplot(mapping = aes(x=Brand)) +
-  geom_bar()
-```
-From the diagram above we can easily see the five most-observed car brands in the dataset. In addition to this, we can easily distinguish that Tesla is the brand with most electric models that are observed within the data. In the tabular view above, the reader can see the exact number of models observed for each one of the fifth brands.
-
-
-### What is the exact number of observations(models) of the fifth most-observed brands ?
-```{r}
-ev %>% 
-  group_by(Brand) %>%
-  summarize(numberOfObservations = n()) %>%
-  filter(numberOfObservations > 5) %>%
-  arrange(desc(numberOfObservations))
-```
-
-From the above tabular view, we can easily see that the most-observed brand, Tesla has 13 models present in the dataset. The same is being closely followed by Audi with 9 and Nissan with just one less than the former.
-
-### What is the ratio of vehicles that are equiped with RapidCharge?
-```{r}
-ev %>%
-  ggplot(mapping = aes(x=RapidCharge)) +
-  geom_bar()
-```
-From the above barchart, we can easily observe that the majority of electric vehicles in the dataset are equipped with RapidCharge.
-
-### What is the exact number of vehicles that are equipped with RapidCharge?
-```{r}
-ev %>%
-  filter(RapidCharge == "Yes") %>%
-  summarize(vehiclesWithRapidCharge = n())
-```
-The code above has identified 97 cars that support rapidcharge, which is presented in the tibble.
-
-### What is the most-common Powertrain, within the different models?
-```{r}
-ev %>%
-  ggplot(mapping = aes(x = PowerTrain)) +
-  geom_bar()
-```
-The barchart above shows the distribution of electric vehicle powertrains. The most common type is the All-wheel-drive, closly followed by the front-wheel drive. The Rear-wheel drive powertrain is less common.
+From the above diagram, we can easily distinguish Tesla as the most-common brand in the dataset, followed by Audi.
 
 ### What is the most common vehicle bodystyle? 
 ```{r}
@@ -86,92 +63,43 @@ ev %>%
 ```
 As it can be seen above a electric model for exists for every bodytype. Although it seems obvious that the SUV and hatchback style is the most common. The reason for the success of electric hatchbacks could be related to the efficiency and / or the price, which will be investigated later.
 
-### What is the most-common number of seats, within a vehicle?
-```{r}
-ev %>%
-  ggplot(mapping = aes(x= Seats)) +
-  geom_bar()
-```
-Most cars are equipped with 5 seats. Some models only have 4 seats but the majority of the electric vehicles can seat 5 people.
-
-### What is the mean price?
-```{r}
-ev %>%
-  summarize(meanPrice = mean(PriceEuro))
-```
-The mean price of all existing electric vehicle models is at 55.997€ according to our data.
-
 ### What is the most-common plugtype?
 ```{r}
 ev %>%
   ggplot(mapping = aes(x=PlugType)) +
   geom_bar()
 ```
-The Type 2 CSS plug is standard equipment in the EU so it is no surprise that this plugtype is by far the most common one.
+From theoretical knowledge, we are aware that the Type 2 CSS plug is standard equipment in the EU so it is no surprise that this plugtype is by far the most common one.
 
-### What is the mean 0-100 km/h acceleration?
-```{r}
-ev %>%
-  summarize(MeanAccelSec = mean(AccelSec))
-```
-The average acceleration time from 0 -100 km/h for all electric vehicles is at 7.39 seconds according to our data.
-
-### What is the Mean top speed in km/h?
-```{r}
-ev %>%
-  summarize(MeanTopSpeed = mean(TopSpeed_KmH))
-```
-The average topspeed of all electric vehicles on the market is at 179.31 km/h
-
-
-### What is the mean range?
-```{r}
-ev %>%
-  summarize(MeanRange = mean(Range_Km))
-```
-As it can be seen above the mean range of all electric vehicles is 338 (kilometers!).
-
-# Do Vehicles with RapidCharge Accelerate different than the ones without ?
-```{r}
-ggplot(ev, aes(x = RapidCharge, y = AccelSec)) +
-  geom_boxplot()
-```
-It appears they actually do! Unforntunately we do not have data on the weight of the vehicle, otherwise we could have investigated futher here.
-
-##What is the number of RapidCharge Vehicles?
+##What is the ratio of vehicles that is equipped with RapidCharge?
+From theoretical knowledge, we are aware that the time required for charging an electric vehicle is quite important. This is due to the fact that the same can be a determining factor of weather one can use their vehicle. From consumer's point of view, we can make a vague suggestion that car brands would have interest of including the RapidCharge option into their vehicles.
 ```{r}
   ggplot(ev, aes(x = RapidCharge)) +
   geom_bar()
 ```
-It appears that the vast majority of Vehicles have RapidCharge.
+It appears that the vast majority of Vehicles do have RapidCharge.
 
 ## Analysing the Co-variations between variables
+After analysing the internal variations within some of the variables in our dataset, we can move on to analysing the covariations between certain variables. This will allows us to identify patterns and accept or reject certain hypothesis.
 
-### How does the mean range vary, between the different bodystyles?
+# Do Vehicles with RapidCharge Accelerate different than the ones without ?
+From theoretical knowledge, we may expect RapidCharge vehicles to be heavier, compared to the same models without the RapidCharge option. This is due to the fact that RapidCharge requires an additonal set of equipment within the vehicle. From Newton's second law of motion, we know that there is a positive correlation between the weight of an object and the required force for moving it. Taken this into account, in addition to the fact that the observed models have engines that are capable of producing different amounts of power and the fact that we are not aware of the weight of each vehicle model, we can make an inexact suggestion that vehicles with RapidCharge may show a different behaviour within the Acceleration 0-100 km/h
 ```{r}
-  ggplot(ev, aes(x=BodyStyle, y = Range_Km)) +
+ggplot(ev, aes(x = RapidCharge, y = AccelSec)) +
   geom_boxplot()
 ```
+It appears they actually do! Unforntunately we do not have data on the weight of the vehicle, otherwise we could have investigated futher here. We also need to take into account the fact that the number of vehicles without RapidCharge is much lower than the other group.
 
 ### How does the Battery Pack size affect the range ?
+From the concept of inertia, described in Newton's first law of motion, we are aware that an external force is required in order to transform a body from a state of rest to a state of motion and to sustain the latter. From additional theoretical knowledge, we are aware that the resource required to produce the force to move the vehicle's body in our case is chemical energy, stored within the battery. The latter transforms the chemical energy into electrical such. The capacity of a battery,describes the amount of electrical energy that can be generated from the electrochemical reactions within it. 
+Furthermore, we are aware that the different vehicle models in our underlying dataset are equipped with Batteries of different sizes. Taken this and the above into account, we can make the assumption that vehicles with larger battery packs are capable of covering longer distances, compared to the ones equipped with smaller batteries. 
 ```{r}
   ggplot(ev, aes(x=Battery_Pack_Kwh, y = Range_Km)) +
-  geom_point()
+  geom_point() +
+  geom_smooth()
 ```
-
-### What is the covariation between 0-100 Acceleration and the bodystyle of a vehicle?
-```{r}
-  ggplot(ev, aes(x=BodyStyle, y = AccelSec)) +
-  geom_boxplot()
-```
-
-### Do vehicles with certain plug type have the highest range?
-```{r}
-  ggplot(ev, aes(x= PlugType, y = Range_Km)) +
-  geom_boxplot()
-```
-
-### Do vehicles with certain powertrain accelerate faster?
+Indeed, we can clearly see a positive correlation between the two variables, which means that our assumption can be taken as a valid one. However, it is worth taking into account the fact that there is a high chance that the observed vehicles differ in weight.
+### Do vehicles with certain powertrain accelerate faster? - there is some interest here
 ```{r}
   ggplot(ev, aes(x = PowerTrain, y = AccelSec)) +
   geom_boxplot()
@@ -290,11 +218,6 @@ The line in the scatter plot shows a clear trend, that the bigger the battery is
 
 ### 6. Does the body style affect the range of the vehicle?
 ```{r}
-library(ggplot2)
-library(ggExtra)
-
-
-
 ev2 <- ev %>% filter(BodyStyle != "SPV")
 ev2 <- ev2 %>% filter(BodyStyle != "Station")
 ev2 <- ev2 %>% filter(BodyStyle != "MPV")
@@ -324,3 +247,9 @@ ggplot(ev2, aes(x=AccelSec, y=BodyStyle)) +
 geom_boxplot()
 ```
 Sedans are mostly the quickest accelerating cars. But a cabrio is the fastest car in this dataset. 
+
+```{r}
+summary(ev)
+```
+
+
