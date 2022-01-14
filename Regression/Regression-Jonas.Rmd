@@ -20,7 +20,7 @@ library(plyr)
 ```
 
 ```{r}
-ev <- read_csv("/Users/jonasbrockmoller/Documents/GitHub/ElectricVehiclesEDA/Dataset/ElectricCarData_Clean_Me.csv")
+ev <- read_csv("ElectricCarData.csv")
 ev
 ```
 Above is the imported data shown contain information about all announced and released fully electric vehicles for the European and American market. In the following I am going to investigate the hypothesis about the relationship between the battery size and the range. In this dataset the battery size is given in KwH and the range is of type kilometers.
